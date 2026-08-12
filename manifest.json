@@ -1,0 +1,16 @@
+{
+  "name": "TrackUp NDA — Mission Control Planner",
+  "short_name": "TrackUp NDA",
+  "description": "NDA & NA (II) 2026 lecture planner, daily tests, mock test tracker and countdown.",
+  "start_url": "./nda_trackup_planner.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#081226",
+  "theme_color": "#0B2545",
+  "icons": [
+    { "src": "logo.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "logo.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "logo.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
