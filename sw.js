@@ -1,5 +1,6 @@
-const CACHE_NAME = 'trackup-nda-v1';
+const CACHE_NAME = 'trackup-nda-v2';
 const ASSETS = [
+  './',
   './nda_trackup_planner.html',
   './manifest.json',
   './logo.png'
@@ -7,7 +8,13 @@ const ASSETS = [
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS)).then(() => self.skipWaiting())
+    caches.open(CACHE_NAME).then((cache) =>
+      Promise.all(
+        ASSETS.map((url) =>
+          cache.add(url).catch((err) => console.warn('SW: could not cache', url, err))
+        )
+      )
+    ).then(() => self.skipWaiting())
   );
 });
 
@@ -21,6 +28,7 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
+  if (!event.request.url.startsWith(self.location.origin)) return;
   event.respondWith(
     caches.match(event.request).then((cached) => {
       const network = fetch(event.request)
@@ -37,8 +45,9 @@ self.addEventListener('fetch', (event) => {
   );
 });
 
-// Allows the page to trigger a local notification via the service worker
-// (needed so notifications can show even when the tab isn't focused).
+// Lets the page ask the service worker to show a notification directly
+// (used as a fallback path; the page also calls registration.showNotification()
+// itself, so this listener is a belt-and-braces backup).
 self.addEventListener('message', (event) => {
   const data = event.data || {};
   if (data.type === 'SHOW_NOTIFICATION') {
@@ -50,6 +59,9 @@ self.addEventListener('message', (event) => {
       renotify: true,
       vibrate: [120, 60, 120]
     });
+  }
+  if (data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
   }
 });
 
@@ -63,3 +75,4 @@ self.addEventListener('notificationclick', (event) => {
     })
   );
 });
+                                                     
